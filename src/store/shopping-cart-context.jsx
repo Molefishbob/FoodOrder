@@ -2,16 +2,20 @@ import { createContext, useState } from "react";
 
 export const CartContext = createContext({
   items: [],
+  cartIsOpen: false,
   addItemToCart: () => {},
   updateItemQuantity: () => {},
 });
 
 export default function CartContextProvider({ children }) {
-  const [shoppingCartState, setShoppingCartState] = useState([]);
+  const [shoppingCartState, setShoppingCartState] = useState({
+    items: [],
+    cartIsOpen: false,
+  });
 
   function handleAddItemToCart(newItem) {
     setShoppingCartState((prevState) => {
-      const updatedItems = [...prevState];
+      const updatedItems = [...prevState.items];
 
       // Check if the item exists in the cart
       const existingItemIndex = updatedItems.findIndex(
@@ -39,7 +43,7 @@ export default function CartContextProvider({ children }) {
         updatedItems.push({ ...newItem, quantity: 1 });
       }
 
-      return [...updatedItems];
+      return { ...prevState, items: [...updatedItems] };
     });
   }
 
@@ -57,12 +61,13 @@ export default function CartContextProvider({ children }) {
         updatedItems[existingItemIndex].quantity += amount;
       }
 
-      return [...updatedItems];
+      return { ...prevState, items: [...updatedItems] };
     });
   }
 
   const context = {
-    items: shoppingCartState,
+    items: shoppingCartState.items,
+    cartIsOpen: shoppingCartState.cartIsOpen,
     addItemToCart: handleAddItemToCart,
     updateItemQuantity: handleUpdateCartItem,
   };
